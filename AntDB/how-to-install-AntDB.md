@@ -21,16 +21,24 @@ yum install -y libxslt-devel
 yum install -y openldap-devel
 yum install -y python-devel
 yum install -y gcc-c++ 
-yum install -y libssh2
+yum install -y libssh2-devel
 ```
+
+通过github 获取源码：
+- git clone https://github.com/ADBSQL/AntDB 
 
 接着就可以进行编译安装步骤：
 
-- step 1: cd 进入源码目录
-- step 2: ./configure ==--prefix=/opt/adbsql== --with-perl --with-python --with-openssl --with-pam --with-ldap --with-libxml --with-libxslt --enable-thread-safety --enable-debug --enable-cassert CFLAGS="-DWAL_DEBUG -O0 -ggdb3"
-- step 3: make install-world-contrib-recurse
+- step 1: mkdir build
+- step 2: cd build
+- step 3: ../Antdb/configure --prefix=/opt/adbsql --with-perl --with-python --with-openssl --with-pam --with-ldap --with-libxml --with-libxslt --enable-thread-safety --enable-debug --enable-cassert CFLAGS="-DWAL_DEBUG -O2 -ggdb3"
+- step 4: make install-world-contrib-recurse
 
-**注:** step 2步骤中，--prefix目录为准备安装的目录，可以根据需求灵活设置。
+**注:**
+> step 1步骤中，由于用同一份代码生成了mgr,agtm，所以需要在源码的同级目录下单独创建build编译目录；
+>
+> step 2步骤中，--prefix目录为准备安装的目录，可以根据需求灵活设置。
+
 ### 1.2 RPM安装 ADB manager
 ---
 通过交付人员提供的rpm包来安装（root用户执行）：
@@ -103,7 +111,9 @@ add host localhost3(port=22,protocol='ssh',adbhome='/opt/adbsql',address="10.1.2
 ---
 deploy命令会将ADB的二进制执行文件打包发送到host表中所有主机上。对于第一次部署集群，或者集群的安装包有更新，为了集群安装的稳定性，则应首先手动清空集群下所有主机的执行文件。
 在集群内各主机之间如果没有设置互信的情况下，执行deploy all需要输入用户密码（当前用户的登录密码），如果设置主机间互信，则可以省去密码的繁琐设置。
+
 **命令：**
+
 一次部署所有主机|	deploy all password 'adb';
 ---|---
 **部署指定的主机**	|**deploy localhost1,localhost2 password 'adb';**
@@ -134,6 +144,7 @@ Node表中添加gtm、coordinator、datanode master、datanode slave等节点信
 注意：host名称必须来自host表，端口号不要冲突，path指定的文件夹下必须为空，否则初始化将失败并报错。这种设置，是防止用户操作时，忘记当前节点下还有有用的数据信息。
 
 **添加命令：**
+
 add节点 | command
 ---|---
 添加coordinator信息|add coordinator 名字(path = 'xxx', host='localhost1', port=xxx);
