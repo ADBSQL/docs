@@ -39,6 +39,9 @@ yum install -y libssh2-devel
 >
 > step 2步骤中，--prefix目录为准备安装的目录，可以根据需求灵活设置。
 
+如果需要使用平滑扩容版本，需要打开编译参数enable-expansion，其余步骤相同。即：
+- step 3:../Antdb/configure --prefix=/opt/adbsql --with-perl --with-python --with-openssl --with-pam --with-ldap --with-libxml --with-libxslt --enable-thread-safety --enable-debug --enable-cassert --enable-expansion
+
 ### 1.2 RPM安装 ADB manager
 ---
 通过交付人员提供的rpm包来安装（root用户执行）：
@@ -147,21 +150,21 @@ Node表中添加gtm、coordinator、datanode master、datanode slave等节点信
 
 add节点 | command
 ---|---
-添加coordinator信息|add coordinator 名字(path = 'xxx', host='localhost1', port=xxx);
+添加coordinator master信息|add coordinator master 名字(path = 'xxx', host='localhost1', port=xxx);
 添加datanode master信息|add datanode master 名字(path = 'xxx', host='localhost1', port=xxx);
-添加datanode slave和extra信息，从节点与master同名，所以同名的master必须存在，同异步关系通过sync参数设置|add datanode slave名字(host='localhost2', port=xxx, path='xxx', sync=t);add datanode extra名字(host='localhost2', port=xxx, path='xxx', sync=f);
+添加datanode slave信息，从节点与master不能重名，同异步关系通过sync参数设置|add datanode slave名字 for mastername(host='localhost2', port=xxx, path='xxx', sync=t);
 添加gtm信息，从节点必须与主节点同名|add gtm master名字(host='localhost3',port=xxx, path='xxx');add gtm slave名字(host='localhost2',port=xxx, path='xxx');add gtm extra名字(host='localhost1',port=xxx, path='xxx');
 
 添加完成后，使用命令list node查看刚刚添加的节点信息
 
 **举例：（gtm/datanode 均为一主一从）**
 ```sql
-add coordinator coord0(path = '/data/adb/adb_data/coord/0', host='localhost1', port=4332);
-add coordinator coord1(path = '/data/adb/adb_data/coord/1', host='localhost2', port=4332);
+add coordinator master coord0(path = '/data/adb/adb_data/coord/0', host='localhost1', port=4332);
+add coordinator master coord1(path = '/data/adb/adb_data/coord/1', host='localhost2', port=4332);
 add datanode master datanode0(path = '/data/adb/adb_data/datanode/0', host='localhost1', port=14332);
-add datanode slave datanode0(host='localhost2',port=14332,path='/data/adb/adb_data/datanode/00');
+add datanode slave datanode0s for datanode0(host='localhost2',port=14332,path='/data/adb/adb_data/datanode/00');
 add datanode master datanode1(path = '/data/adb/adb_data/datanode/1', host='localhost2', port=24332);
-add datanode slave datanode1(host='localhost1',port=24332,path='/data/adb/adb_data/datanode/11');
+add datanode slave datanode1s for datanode1(host='localhost1',port=24332,path='/data/adb/adb_data/datanode/11');
 add gtm master gtm(host='localhost3',port=6655, path='/data/adb/adb_data/gtm');
 add gtm slave gtm(host='localhost2',port=6655,path='/data/adb/adb_data/gtm_slave');
 ```
@@ -234,4 +237,44 @@ postgres=# monitor all ;
  gtm      | gtm slave       | t      | running     | 10.1.226.202 |  6655
 (6 rows)
 ```
-**至此，ADB集群初始化完成！**
+
+**如果不使用平滑扩容特性，则到此可以开始使用ADB集群~若使用，对应1.1章节编译时需要打开编译开关，进行2.7章节的平滑扩容版本配置。**
+### 2.7 平滑扩容版本初始化
+Antdb采用hash+map路由算法实现：将集群的数据划分为1024个slot,对分片字段hash后，除1024取模，得到一个对应的slotid；数据路由时，通过slotid从映射表中找到对应的node节点。
+
+> （1）连接mgr，初始化pgxcnode和adb_slot表
+```sql
+cluster pgxcnode init;
+cluster meta init;
+```
+> （2）连接mgr，初始化slot信息（slot分布）
+```shell
+设置slotid与节点的对应关系。
+语法:cluster slot init (node='节点名', s节点名=开始slot位置, e节点名=结束slot位置)
+例2个节点，每个节点依次分配512个slot
+cluster slot init(node='db1', sdb1=0, edb1=511, node='db2', sdb2=512, edb2=1023);
+例2个节点，第1个分配每个节点依次分配10个slot，第2个分配1013个
+cluster slot init(node='db1', sdb1=0, edb1=9, node='db2', sdb2=10, edb2=1023);
+例4个节点，每个节点依次分配256个slot
+cluster slot init(node='db1', sdb1=0, edb1=255, node='db2', sdb2=256, edb2=511, node='db2', sdb2=512, edb2=767, node='db4', sdb4=768, edb4=1023);
+命令会对slot的连续性和有效性进行检测。
+```
+> （3）创建slot表默认访问用户并分配权限
+```sql
+--连接一个coordinator的postgres库，执行以下语句
+CREATE USER adbslotuser WITH PASSWORD 'asiainfonj';
+alter user adbslotuser nosuperuser;
+grant all on SCHEMA adb  to adbslotuser;
+grant select on table adb.adb_slot to adbslotuser;
+```
+到此，初始化hash slot信息配置过程完成。
+
+注：在使用过程中，需要注意每个数据库（除去postgres库）中都需要创建dblink extension
+```sql
+create database test;
+--连击到test库,创建dblink
+\c test
+create extension dblink;
+```
+
+**至此，ADB集群初始化全部完成！**
