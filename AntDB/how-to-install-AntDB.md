@@ -153,7 +153,7 @@ add节点 | command
 添加coordinator master信息|add coordinator master 名字(path = 'xxx', host='localhost1', port=xxx);
 添加datanode master信息|add datanode master 名字(path = 'xxx', host='localhost1', port=xxx);
 添加datanode slave信息，从节点与master不能重名，同异步关系通过sync参数设置|add datanode slave名字 for mastername(host='localhost2', port=xxx, path='xxx', sync=t);
-添加gtm信息，从节点必须与主节点同名|add gtm master名字(host='localhost3',port=xxx, path='xxx');add gtm slave名字(host='localhost2',port=xxx, path='xxx');add gtm extra名字(host='localhost1',port=xxx, path='xxx');
+添加gtm信息，从节点与master不能重名，同异步关系通过sync参数设置|add gtm master名字(host='localhost3',port=xxx, path='xxx');add gtm slave名字 for mastername(host='localhost2',port=xxx, path='xxx',sync=t);
 
 添加完成后，使用命令list node查看刚刚添加的节点信息
 
@@ -166,7 +166,7 @@ add datanode slave datanode0s for datanode0(host='localhost2',port=14332,path='/
 add datanode master datanode1(path = '/data/adb/adb_data/datanode/1', host='localhost2', port=24332);
 add datanode slave datanode1s for datanode1(host='localhost1',port=24332,path='/data/adb/adb_data/datanode/11');
 add gtm master gtm(host='localhost3',port=6655, path='/data/adb/adb_data/gtm');
-add gtm slave gtm(host='localhost2',port=6655,path='/data/adb/adb_data/gtm_slave');
+add gtm slave gtms for gtm(host='localhost2',port=6655,path='/data/adb/adb_data/gtm_slave');
 ```
 
 ### 2.5 配置节点参数
