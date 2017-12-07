@@ -31,7 +31,7 @@ yum install -y libssh2-devel
 
 - step 1: mkdir build
 - step 2: cd build
-- step 3: ../Antdb/configure --prefix=/opt/adbsql --with-perl --with-python --with-openssl --with-pam --with-ldap --with-libxml --with-libxslt --enable-thread-safety --enable-debug --enable-cassert CFLAGS="-DWAL_DEBUG -O2 -ggdb3"
+- step 3: ../AntDB/configure --prefix=/opt/adbsql --with-perl --with-python --with-openssl --with-pam --with-ldap --with-libxml --with-libxslt --enable-thread-safety --enable-debug --enable-cassert CFLAGS="-DWAL_DEBUG -O2 -ggdb3"
 - step 4: make install-world-contrib-recurse
 
 **注:**
