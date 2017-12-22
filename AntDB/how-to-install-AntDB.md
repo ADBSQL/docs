@@ -201,7 +201,7 @@ reset参数：
 ---
 集群的节点都已经配置完成，此时就可以使用命令init all启动集群了。如下图，可以看到init all内部的操作步骤。    
 >注意：如果后续需要使用pg_rewind将failover后的old master 添加回集群，此处操作需要注意：    
-如果用的是AntDB2.2版本，init的时候需要开启data_checksum:  init all data_checksums . 
+如果用的是AntDB2.2版本，init的时候需要开启data_checksum:  init all data_checksums .     
 如果用的是AntDB3.1+版本，两种方式:
 >1. init之前需要开启 data_checksums:  init all data_checksums .     
 >2. init 完成后  set datanode all (wal_log_hints = on); 然后重启即可。
