@@ -187,9 +187,10 @@ drop hba all ("host all all 10.0.0.0 8 trust");
 ADB manager与ADB 集群的源码绑定在一起，所以编译ADB manager，就是编译ADB 集群的源码。
 
 下面是编译安装步骤：
-- **step 1:** cd 进入源码目录
-- **step 2:** ./configure --prefix=/opt/pgsql --with-perl --with-python --with-openssl --with-pam --with-ldap --with-libxml --with-libxslt --enable-thread-safety --enable-debug --enable-cassert CFLAGS="-DWAL_DEBUG -O0 -ggdb3"
-- **step 3:** make install-world-contrib-recurse
+step 1: mkdir build
+step 2: cd build
+step 3: ../AntDB/configure --prefix=/opt/adbsql --with-perl --with-python --with-openssl --with-pam --with-ldap --with-libxml --with-libxslt --enable-thread-safety --enable-debug --enable-cassert CFLAGS="-DWAL_DEBUG -O2 -ggdb3"
+step 4: make install-world-contrib-recurse
 
 备注：编译ADB manager过程中会提示各种库没有安装，如何安装这些库，请参考附录A。
 
