@@ -15,7 +15,7 @@ hba | 允许哪些IP范围的客户端通过哪种认证方式访问指定的数
 ### 1.1 ADB manager简介
    ADB manager是针对ADB 集群的管理工具，具有管理ADB集群的所有功能，包括ADB集群的初始化，启动，停止；所有集群节点的参数设置；也包括ADB集群的扩缩容等功能。
 ADB manager 与ADB 集群之间的关系如下图所示：
-![集群架构图]()
+![集群架构图](https://user-images.githubusercontent.com/13678346/38128804-abffa1de-342e-11e8-85a9-61aa211fd118.png)
 
 由上图可知，ADB集群部署在主机host1，host2，host3，host4等不仅仅4台机器上，ADB manager为了实现管理ADB 集群的功能，需要在每台主机上启动一个叫agent的进程，
 ADB manager通过agent进程实现对ADB集群的管理。ADB manager 包括对agent进程的管理.
