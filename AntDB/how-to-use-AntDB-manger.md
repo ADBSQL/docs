@@ -32,6 +32,7 @@ Host表用于存放部署ADB 集群的主机和agent进程等信息。如下图�
 postgres=# list host;
 ```
 输出结果罗列在下面的表格中：
+
 name| user| port| protocol| agentport|address|adbhome
 ---|---|---|---|---|---|---
  localhost1 | gd   |   22 | ssh      |     10906 | 10.21.20.175 | /data/gd/app
@@ -39,6 +40,7 @@ name| user| port| protocol| agentport|address|adbhome
 (2 rows)
 
 Host表共有7 列，每列的详细解释如下：
+
 列名|	描述
 ---|---
 name|	主机名，即address列的IP address对应的主机名。
@@ -70,6 +72,7 @@ node 表用于保存部署ADB 集群中每个节点的信息，同时包括从�
 postgres=# list node;
 ```
 输出结果选取5条罗列在下面的表格中：
+
   name  |    host    |      type       | mastername | port  | sync_state |           path            | initialized | incluster 
 ---|---|---|---|---|---|---|---|---
  coord1 | localhost1 | coordinator     |            |  6604 |            | /data/gd/pgxc_data/coord1 | t           | t
@@ -79,6 +82,7 @@ postgres=# list node;
  gtm    | localhost1 | gtm master      |            |  7693 |            | /data/gd/pgxc_data/gtm    | t           | t
  
  Node表中共10列，每列的解释如下：
+ 
  列名	| 描述
  ---|---
 name	|ADB 集群中节点的名字，比如coord2就是其中一个coordinator的名称。
@@ -127,14 +131,18 @@ drop gtm slave gtm;
 postgres=# list param;
 ```
 输出结果选取5条罗列在下面的表格中：
+
  nodename |          nodetype           |            key            | value 
----|---|---|---|---
- *        | coordinator                 | listen_addresses          | '*'
- *        | coordinator                 | max_connections           | 800
- *        | coordinator                 | max_prepared_transactions | 800
- *        | coordinator                 | shared_buffers            | 5GB
- *        | datanode master|slave|extra | listen_addresses          | '*'
- Param表由4列构成，每列的解释如下：
+ ---|---|---|---
+  '*'        | coordinator                 | listen_addresses          | '*'
+  '*'        | coordinator                 | max_connections           | 800
+  '*'        | coordinator                 | max_prepared_transactions | 800
+   '*'       | coordinator                 | shared_buffers            | 5GB
+  '*'      | datanode master|slave|extra | listen_addresses          | '*'
+
+Param表由4列构成，每列的解释如下：
+
+
 列名	|描述
 ---|---
 nodename	|ADB 集群节点名字，星号“*”代表所有nodetype节点配置相同的配置。
@@ -168,10 +176,12 @@ list param;
 ---
 hba表用于管理存放ADB集群中所有coordiantor节点的pg_hba.conf文件中的配置项，当配置项被添加后，就会记录到此表中，用来标识。对于添加过的配置项，可以通过list hba命令显示。
 hba表由2列构成，每列的解释如下：
+
 列名	|描述
 ---|---
 nodename|	ADB 集群节点名字，星号“*”代表所有nodetype节点配置相同的配置。
 hbavalue|	hba配置项的具体值。
+
 对hba表常用操作命令举例如下(命令的具体使用方法参考第四章hba表相关命令)：
 ```sql
 --向hba表中添加内容:
