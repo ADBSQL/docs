@@ -21,7 +21,7 @@
 
 - 创建辅助表
 ```sql
-CREATE [UNLOGGED] AUXILIARY TABLE [auxiliary_table_name]
+CREATE AUXILIARY TABLE [auxiliary_table_name]
 ON master_table_name ( column_name [ index_options ])
 [ TABLESPACE tablespace_name ]
 [ DISTRIBUTE BY OptDistributeType ]
