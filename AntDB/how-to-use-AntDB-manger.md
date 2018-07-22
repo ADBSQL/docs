@@ -15,14 +15,14 @@ hba | 允许哪些IP范围的客户端通过哪种认证方式访问指定的数
 
 ### 1.1 Adbmgr简介
 
-   Adbmgr 是针对AntDB 集群的管理工具，具有管理AntDB集群的所有功能，包括AntDB集群的初始化，启动，停止；所有集群节点的参数设置；也包括ADB集群的扩缩容等功能。
+   Adbmgr 是针对AntDB 集群的管理工具，具有管理AntDB集群的所有功能，包括AntDB集群的初始化，启动，停止；所有集群节点的参数设置；也包括AntDB集群的扩缩容等功能。
 Adbmgr 与AntDB 集群之间的关系如下图所示：
 ![集群架构图](https://user-images.githubusercontent.com/13678346/38128804-abffa1de-342e-11e8-85a9-61aa211fd118.png)
 
-由上图可知，AntDB集群部署可以在主机host1，host2，host3，host4等多台机器上，Adbmgr 为了实现管理AntDB 集群的功能，需要在每台主机上启动一个叫agent的进程，
+AntDB集群部署可以在多台机器上，Adbmgr 为了实现管理AntDB 集群的功能，需要在每台主机上启动一个叫agent的进程，
 Adbmgr 通过agent进程实现对AntDB集群的管理。Adbmgr 包括对agent进程的管理.
 
-比如，用户执行了一个 start 命令来启动host1主机上的某个集群节点，Adbmgr 就会把start命令传给host1主机上的agent进程，由agent进程执行start命令；然后agent把start命令的执行结果传给Adbmgr 并显示给用户命令的执行结果。所以，AntDB集群所在的主机上都要启动一个agent进程。
+比如，用户执行了一个 start 命令来启动host1主机上的某个集群节点，Adbmgr 就会把start命令传给host1主机上的agent进程，由agent进程执行start命令；然后agent把start命令的执行结果传给Adbmgr 并显示为用户命令的执行结果。所以，AntDB集群所在的主机上都要启动一个agent进程。
 
 为实现方便管理AntDB 集群的目的，在Adbmgr中有4张表，用于存储AntDB集群的基本配置，Adbmgr的所有操作命令都是针对这4张表进行操作的，所以有必要详细介绍这4张表。
 
@@ -39,10 +39,8 @@ postgres=# list host;
 
 name| user| port| protocol| agentport|address|adbhome
 ---|---|---|---|---|---|---
- localhost1 | gd   |   22 | ssh      |     10906 | 10.21.20.175 | /data/gd/app
- localhost2 | gd   |   22 | ssh      |     10906 | 10.21.20.176 | /data/gd/app
-(2 rows)
-
+ localhost1 | gd   |   22 | ssh      |     10906 | 10.21.20.175 | /data/antdb/app 
+ localhost2 | gd   |   22 | ssh      |     10906 | 10.21.20.176 | /data/antdb/app 
 Host表共有7 列，每列的详细解释如下：
 
 列名|	描述
@@ -64,8 +62,8 @@ pghome	|部署AntDB 集群的可执行文件(二进制文件)在主机上的存�
 
 下面是对host表常用操作命令例子：
 ```sql
-add host localhost1( user=gd, protocol=ssh, address='10.21.20.175', agentport=10906, adbhome='/data/gd/app');
-alter host localhost1(adbhome='/opt/app/adb');
+add host localhost1( user=gd, protocol=ssh, address='10.21.20.175', agentport=10906, adbhome='/data/antdb/app');
+alter host localhost1(adbhome='/opt/antdb/app');
 drop host localhost1;
 list host;
 ```
@@ -84,19 +82,19 @@ postgres=# list node;
 
   name  |    host    |      type       | mastername | port  | sync_state |           path            | initialized | incluster | readonly
 ---|---|---|---|---|---|---|---|---|--
- coord1 | localhost1 | coordinator     |            |  6604 |            | /data/gd/pgxc_data/coord1 | t           | t|f
- coord2 | localhost2 | coordinator     |            |  6604 |            | /data/gd/pgxc_data/coord1 | t           | t|f
- db1    | localhost1 | datanode master |            | 16323 |            | /data/gd/pgxc_data/db1    | t           | t|f
- db2    | localhost2 | datanode master |            | 16323 |            | /data/gd/pgxc_data/db2    | t           | t|f
- gtm    | localhost1 | gtm master      |            |  7693 |            | /data/gd/pgxc_data/gtm    | t           | t|f
+ coord1 | localhost1 | coordinator master |            |  6604 |            | /data/antdb/data/coord1 | t           | t|f
+ coord2 | localhost2 | coordinator master |            |  6604 |            | /data/antdb/data/coord1 | t           | t|f
+ db1    | localhost1 | datanode master |            | 16323 |            | /data/antdb/data/db1 | t           | t|f
+ db2    | localhost2 | datanode master |            | 16323 |            | /data/antdb/data/db2 | t           | t|f
+ gtm    | localhost1 | gtm master      |            |  7693 |            | /data/antdb/data/gtm | t           | t|f
 
- Node表中共10列，每列的解释如下：
+ Node表中每列的解释如下：
 
  列名	| 描述
  ---|---
 name	|AntDB 集群中节点的名字，比如coord2就是其中一个coordinator的名称。
 host	|节点所在的主机，比如coord2节点部署在localhost2主机上。
-type	|节点的类型，比如coord2就是ADB集群中其中一个coordinator。
+type	|节点的类型，比如coord2就是AntDB集群中其中一个coordinator。
 mastername|	主节点名字。本列只有从节点有效，对主节点无效
 port	|端口号。节点部署在主机上使用的端口号。
 sync_state	|同/异步关系。仅对从节点有效。值“sync”表示该从节点是同步从节点，“potential”表示该从节点是潜在同步节点，“async”表示该从节点是异步从节点。
@@ -107,7 +105,7 @@ readonly|本节点是否是只读模式的，只针对coordinator类型的节点
 
 下面是对node表常用操作命令例子（详细命令的使用方法参考第四章中node表相关命令）：
 ```sql
---向node表添加AntDB集群的节点信息：
+-- 向node表添加AntDB集群的节点信息：
 add gtm master gtm_1 (host=localhost1,port=6768,path='/home/antdb/data/gtm');
 add gtm slave gtm_2 for gtm_1 (host=localhost2,port=6768,path='/home/antdb/data/gtm');
 add coordinator master coord1(host=localhost1, port=5532,path='/home/antdb/data/coord1');
@@ -118,16 +116,16 @@ add datanode slave db1_3 for db1_1 (host=localhost3, port=15533,path='/home/antd
 add datanode master db2_1(host=localhost2, port=15436,path='/home/antdb/data/db2');
 add datanode slave db2_2 for db2_1 (host=localhost1, port=15436,path='/home/antdb/data/db2');
 add datanode slave db2_3 for db2_1 (host=localhost3, port=15436,path='/home/antdb/data/db2');
---修改node表中的某一列(在集群没有init以前可以随意修改node表中的值)：
-alter datanode slave datanode1(port=34332);
-alter datanode master datanode0(port=8899); 
---删除node表中的一行(在集群没有init以前可以随意添加和删除node表中的值)：
+-- 修改node表中的某一列(在集群没有init以前可以随意修改node表中的值)：
+alter datanode slave db1_2(port=34332);
+alter datanode master db1_1(port=8899); 
+-- 删除node表中的一行(在集群没有init以前可以随意添加和删除node表中的值)：
 drop datanode slave db1_2;
 drop datanode master db1_1;
-drop coordinator master coord0;
+drop coordinator master coord1;
 drop gtm slave gtm_1;
---显示node表中所有节点信息：
- list node;
+-- 显示node表中所有节点信息：
+list node;
 ```
  ### 1.4 param表介绍
 ---
@@ -143,25 +141,25 @@ postgres=# list param;
 
  nodename |          nodetype           |            key            | value 
  ---|---|---|---
-  '*'        | coordinator                 | listen_addresses          | '*'
-  '*'        | coordinator                 | max_connections           | 800
-  '*'        | coordinator                 | max_prepared_transactions | 800
-   '*'       | coordinator                 | shared_buffers            | 5GB
-  '*'      | datanode master|slave|extra | listen_addresses          | '*'
+  '*'        | coordinator master\|slave | listen_addresses          | '*'
+  '*'        | coordinator master\|slave | max_connections           | 800
+  '*'        | coordinator master\|slave | max_prepared_transactions | 800
+  '*'      | datanode master\|slave |max_connections|1000
+*        | gtm master\|slave |max_connections         | 2000             
 
-Param表由4列构成，每列的解释如下：
+Param表每列的解释如下：
 
 
 列名	|描述
 ---|---
 nodename	|AntDB 集群节点名字，星号“*”代表所有nodetype节点配置相同的配置。
 nodetype	|节点类型。
-key	|Postgresql.conf文件中变量名
+key	|postgresql.conf文件中变量名
 value|	key对应的变量值。
 
 对param表常用操作命令举例如下(命令的具体使用方法参考第四章param表相关命令)：
 ```sql
---向param表中添加一行：
+-- 向param表中添加一行：
 set gtm all (max_connections=1200);
 set gtm master gtm_1(superuser_reserved_connections=13);
 set gtm slave gtm_2(superuser_reserved_connections=14);
@@ -172,15 +170,15 @@ set datanode all(default_statistics_target=100);
 set datanode master db1_1 (autovacuum_vacuum_cost_delay='30ms');
 set datanode slave db1_2 (autovacuum_vacuum_cost_delay='60ms');
 set datanode slave db1_3 (autovacuum_vacuum_cost_delay='90ms');
---把参数重新设置为默认值：
+-- 把参数重新设置为默认值：
 reset datanode master all ( max_connections);
---显示param表中所有数据：
+-- 显示param表中所有数据：
 list param;
 ```
 ### 1.5 hba表介绍
 ---
 hba表用于管理存放AntDB集群中所有coordiantor节点的pg_hba.conf文件中的配置项，当配置项被添加后，就会记录到此表中，用来标识。对于添加过的配置项，可以通过list hba命令显示。
-hba表由2列构成，每列的解释如下：
+hba表每列的解释如下：
 
 列名	|描述
 ---|---
@@ -226,16 +224,17 @@ rpm -ivh adb-3.2.703602c-10.el7.centos.x86_64.rpm
 编译Adbmgr 之后，会在指定的目录的bin目录下产生initmgr，和mgr_ctl可执行文件。要想初始化Adbmgr 还需要配置PATH变量才行。
 向当前用户下的隐含文件bashrc中,执行vim ~/.basrhrc打开文件，追加如下内容：
 ```shell
-export PGHOME=/opt/app/antdb 
-export PATH=$PGHOME/bin:$PATH
-export LD_LIBRARY_PATH=$PGHOME/lib:$LD_LIBRARY_PATH
+export ADBHOME=/opt/app/antdb 
+export PATH=$ADBHOME/bin:$PATH
+export LD_LIBRARY_PATH=$ADBHOME/lib:$LD_LIBRARY_PATH
 ```
 然后执行source .bashrc 使其生效即可。
 
 注释：
-对于PGHOME参数内容需要根据AntDB的编译产生的二进制可执行文件的存放路径设置。
+对于ADBHOME参数内容需要根据AntDB的编译产生的二进制可执行文件的存放路径设置。
 例如二进制文件存放在用户antdb的app目录下，则PGHOME=/home/antdb/app。
 执行下面命令开始初始化Adbmgr：
+
 - **initmgr –D /data/antdb/mgr1**
 
 其中/data/antdb/mgr1是用户自己指定的存放Adbmgr 的安装目录，用户可随意设置。
@@ -333,8 +332,13 @@ server stopped
 
 如何使用Adbmgr 快速搭建AntDB 集群？首先需要通过psql客户端来了解一下Adbmgr是如何管理AntDB 集群的。
 通过如下命令可以登录到Adbmgr上：
+
+```
 psql -d postgres -p 10090 
+```
+
 注：-p后面是端口号，因为配置文件中已将默认的6432修改为10090，这是为了防止端口冲突。
+
 ```shell
 [gd@INTEL175 ~]$ psql -d postgres -p 10090                              
 psql (ADB 3.0 based on PG 9.6.2 ADB 3.1devel 7fb79fd9d3)
@@ -346,9 +350,12 @@ postgres=#
 ### 3.1 添加主机(host)
 ---
 Adbmgr通过三张表格管理集群，host、node和param表。
-Host表用来存储搭建AntDB 集群所需要的所有主机信息。
-Node表用来存储搭建AntDB 集群所有的节点信息。
-Param表用来存储对AntDB 集群中节点参数设置的所有信息。
+
+- host表用来存储搭建AntDB 集群所需要的所有主机信息。
+
+- node表用来存储搭建AntDB 集群所有的节点信息。
+- param表用来存储对AntDB 集群中节点参数设置的所有信息。
+
 首先需要在host表中添加主机信息，后面gtm、datanode、coordinator会部署到这些主机上:
 
 添加命令|	add host 主机名(address, agentport,user,adbhome);
@@ -370,6 +377,7 @@ add host localhost3(port=22,protocol='ssh',adbhome='/home/antdb/app',address="10
 deploy命令会将AntDB的二进制执行文件打包发送到host表中所有主机上。对于第一次部署集群，或者集群的安装包有更新，为了集群安装的稳定性，则应首先手动清空集群下所有主机的执行文件。
 在集群内各主机之间如果没有设置互信的情况下，执行deploy all需要输入用户密码（当前用户的登录密码），如果设置主机间互信，则可以省去密码的繁琐设置。
 **命令：**
+
 一次部署所有主机| deploy all password ' 123456'; 
 ---|---
 **部署指定的主机**	|**deploy localhost1,localhost2 password ' 123456';**
@@ -379,7 +387,7 @@ deploy命令会将AntDB的二进制执行文件打包发送到host表中所有�
 ---
 有两种方式：一次启动全部agent和单独启动一台主机agent（多个主机需要多次执行）。
 
-注意：password是host表中主机user对应的linux系统密码，用于与主机通信，而非ADB的用户密码。
+注意：password是host表中主机user对应的linux系统密码，用于与主机通信，而非AntDB数据库的用户密码。
 当密码是以数字开头时，需要加上单引号或者双引号，例如password ‘12345z’是正确的，password 12345z则会报错；如果密码不是以数字开头，则加不加引号都行。
 
 一次启动全部agent| start agent all  password ' 123456'; 
@@ -401,6 +409,7 @@ Node表中添加gtm、coordinator、datanode master、datanode slave等节点信
 注意：host名称必须来自host表，端口号不要冲突，path指定的文件夹下必须为空，否则初始化将失败并报错。这种设置，是防止用户操作时，忘记当前节点下还有有用的数据信息。
 
 **添加命令：**
+
 add节点 | command
 ---|---
 添加coordinator信息|add coordinator master 名字(path = 'xxx', host='localhost1', port=xxx);
@@ -473,16 +482,16 @@ postgres=# init all ;
 通过monitor all 查看集群各个节点的运行状态：
 ```shell
 postgres=# monitor all ;
- nodename |    nodetype     | status | description |     host     | port  
+ nodename |    nodetype           | status | description |     host     | port  
 ----------+-----------------+--------+-------------+--------------+-------
- coord1   | coordinator     | t      | running     | 10.1.226.201 |  4332
- coord2   | coordinator     | t      | running     | 10.1.226.202 |  4332
- db1      | datanode master | t      | running     | 10.1.226.201 | 14332
- db1      | datanode slave  | t      | running     | 10.1.226.202 | 14332
- db2      | datanode master | t      | running     | 10.1.226.202 | 24332
- db2      | datanode slave  | t      | running     | 10.1.226.201 | 24332
- gtm      | gtm master      | t      | running     | 10.1.226.203 |  6655
- gtm      | gtm slave       | t      | running     | 10.1.226.202 |  6655
+ coord1   | coordinator  master   | t      | running     | 10.1.226.201 |  4332
+ coord2   | coordinator  master   | t      | running     | 10.1.226.202 |  4332
+ db1      | datanode master       | t      | running     | 10.1.226.201 | 14332
+ db1      | datanode slave        | t      | running     | 10.1.226.202 | 14332
+ db2      | datanode master       | t      | running     | 10.1.226.202 | 24332
+ db2      | datanode slave        | t      | running     | 10.1.226.201 | 24332
+ gtm      | gtm master            | t      | running     | 10.1.226.203 |  6655
+ gtm      | gtm slave             | t      | running     | 10.1.226.202 |  6655
 (6 rows)
 ```
 **至此，AntDB集群初始化完成！**
@@ -490,11 +499,11 @@ postgres=# monitor all ;
 ## 第四章 管理AntDB 集群
 
 为了方便管理AntDB 集群，Adbmgr提供了一系列的操作命令。根据命令的功能可以划分为下面六类：
-- Agent相关命令
-- Host表相关命令
-- Node表相关命令
-- Param表相关命令
-- Hba表相关命令
+- agent相关命令
+- host表相关命令
+- node表相关命令
+- param表相关命令
+- hba表相关命令
 - 集群管理相关命令
 
 下面分别介绍这些命令的功能和格式。
@@ -569,13 +578,13 @@ Stop agent和Monitor agent三个命令，下面对这三个命令进行介绍。
 
 **命令举例：**
 ```sql
---启动host表中主机上所有主机上的agent进程（主机之间没有配置互信，所有主机上用户密码都为'sdg3565'）：
+-- 启动host表中主机上所有主机上的agent进程（主机之间没有配置互信，所有主机上用户密码都为'sdg3565'）：
 START AGENT ALL PASSWORD 'sdg3565';
---启动host表中主机上所有主机上的agent进程，（主机之间已经配置互信）：
+-- 启动host表中主机上所有主机上的agent进程，（主机之间已经配置互信）：
 START AGENT ALL ;
---启动host表中host1，host2主机上的agent进程（主机之间没有配置互信，host1，host2上用户密码都为'sdg3565'）：
+-- 启动host表中host1，host2主机上的agent进程（主机之间没有配置互信，host1，host2上用户密码都为'sdg3565'）：
 START AGENT host1, host2 PASSWORD 'sdg3565';
---启动host表中host1，host2主机上的agent进程（主机之间已经配置互信）：
+-- 启动host表中host1，host2主机上的agent进程（主机之间已经配置互信）：
 START AGENT host1, host2 ;
 ```
 #### 4.2.2 stop agent
@@ -588,9 +597,9 @@ START AGENT host1, host2 ;
 
 **命令举例：**
 ```sql
---停止host表中所有主机上的agent进程：
+-- 停止host表中所有主机上的agent进程：
 STOP AGENT ALL ;
---停止host表中host1，host2主机上的agent进程：
+-- 停止host表中host1，host2主机上的agent进程：
 STOP AGENT host1, host2 ;
 ```
 #### 4.2.3 monitor agent
@@ -603,9 +612,9 @@ STOP AGENT host1, host2 ;
 
 **命令举例：**
 ```sql
---查看host表中所有主机上的agent进程的运行状态：
+-- 查看host表中所有主机上的agent进程的运行状态：
 MONITOR AGENT ALL ;
---查看host表中host1，host2主机上agent进程的运行状态：
+-- 查看host表中host1，host2主机上agent进程的运行状态：
 MONITOR AGENT host1, host2 ;
 ```
 ### 4.3 host表相关命令
@@ -640,7 +649,7 @@ port_number：protocol_type对用的协议的端口号，现只支持ssh，默�
 ```
 **命令举例：**
 ```sql
---添加主机名为host_name1信息：数据库安装用户antdb,数据库安装包使用ssh协议传输，host_name1对应的ip为”10.1.226.202”, agent监听端口5660，安装包存放路径设置为”/opt/antdb/app”：
+-- 添加主机名为host_name1信息：数据库安装用户antdb,数据库安装包使用ssh协议传输，host_name1对应的ip为”10.1.226.202”, agent监听端口5660，安装包存放路径设置为”/opt/antdb/app”：
 ADD HOST host_name1(USER=antdb, PROTOCOL=ssh, ADDRESS='10.1.226.202', AGENTPORT=5660, adbhome='/opt/antdb/app');
 ```
 
@@ -742,10 +751,11 @@ FLUSH HOST;
 ```
 ### 4.4 node表相关命令
 Node表用于保存部署AntDB 集群中每个节点的信息，同时包括从节点与主节点之间的同/异步关系等。管理node表的操作命令有:
->- add node（包含ADD GTM、ADD COORDINATOR、ADD DATANODE）
->- alter node（包含ALTER GTM、ALTER COORDINATOR、ALTER DATANODE）
->- drop node（包含DROP GTM、DROP COORDINATOR、DROP DATANODE）
->- list node
+
+- add node（包含ADD GTM、ADD COORDINATOR、ADD DATANODE）
+- alter node（包含ALTER GTM、ALTER COORDINATOR、ALTER DATANODE）
+- drop node（包含DROP GTM、DROP COORDINATOR、DROP DATANODE）
+- list node
 
 下面对这四个命令进行介绍
 
@@ -784,19 +794,15 @@ readonly_type：该coordinator是否为只读节点
 
 **命令举例：**
 ```sql
---添加gtm master节点，主机为localhost1, 端口为6768，数据路径”/home/antdb/data/gtm”：
+-- 添加gtm master节点，主机为localhost1, 端口为6768，数据路径”/home/antdb/data/gtm”：
 ADD GTM MASTER gtm (HOST=localhost1, PORT=6768, PATH='/home/antdb/data/gtm');
-
---添加gtm slave节点，主机为localhost2, 端口为6768，数据路径”/home/antdb/data/gtm”：
+-- 添加gtm slave节点，主机为localhost2, 端口为6768，数据路径”/home/antdb/data/gtm”：
 ADD GTM SLAVE gtms for gtm (HOST=localhost2, PORT=6768, SYNC=t, PATH='/home/antdb/data/gtm');
-
---添加coordinator节点coord1信息，主机为localhost1，端口为5532，数据路径”/home/antdb/data/coord1”：
+-- 添加coordinator节点coord1信息，主机为localhost1，端口为5532，数据路径”/home/antdb/data/coord1”：
 ADD COORDINATOR master coord1(HOST=localhost1, PORT=5532,PATH='/home/antdb/data/coord1');
-
---添加datanode master节点db1，主机为localhost1，端口为15533，数据路径为”/home/antdb/data/db1”：
+-- 添加datanode master节点db1，主机为localhost1，端口为15533，数据路径为”/home/antdb/data/db1”：
 ADD DATANODE MASTER db1(HOST=localhost1, PORT=15533,PATH='/home/antdb/data/db1');
-
---添加datanode slave节点db1，主机为localhost2，端口为15533，数据路径为”/home/antdb/data/db1”：
+-- 添加datanode slave节点db1，主机为localhost2，端口为15533，数据路径为”/home/antdb/data/db1”：
 ADD DATANODE SLAVE db1s for db1(HOST=localhost1, PORT=15533, SYNC=t, PATH= '/home/antdb/data/db1');
 ```
 
@@ -832,25 +838,19 @@ pg_data：节点数据路径，需要保证该目录是空目录。
 
 **命令举例：**
 ```sql
---集群初始化前，更新gtm master端口号为6666：
+-- 集群初始化前，更新gtm master端口号为6666：
 ALTER GTM MASTER gtm (PORT=6666);
-
---更新gtm slave与gtm master为同步关系：
+-- 更新gtm slave与gtm master为同步关系：
 ALTER GTM SLAVE gtms (SYNC_STATE='sync');
-
---更新gtm extra与gtm master为异步关系：
+-- 更新gtm extra与gtm master为异步关系：
 ALTER GTM SLAVE gtms (SYNC_STATE='async');
-
---集群初始化前，更新coordinator coord1端口为5532，数据路径为”/home/antdb/data/coord1”:
+-- 集群初始化前，更新coordinator coord1端口为5532，数据路径为”/home/antdb/data/coord1”:
 ALTER COORDINATOR master coord1 (PORT=5532, PATH=’/home/antdb/data/coord1’);
-
---集群初始化前，更新datanode master db1主机为localhost5，数据路径为”/home/antdb/data/db1”:
+-- 集群初始化前，更新datanode master db1主机为localhost5，数据路径为”/home/antdb/data/db1”:
 ALTER DATANODE MASTER db1 (HOST=localhost5, PATH=’/home/antdb/data/coord1’);
-
---更新datanode slave db1与主机datanode master为同步关系：
+-- 更新datanode slave db1与主机datanode master为同步关系：
 ALTER DATANODE SLAVE db1s (SYNC_STATE='sync');
-
---更新datanode extra db1与主机datanode master为异步关系：
+-- 更新datanode extra db1与主机datanode master为异步关系：
 ALTER DATANODE SLAVE db1s (SYNC_STATE='async');
 ```
 
@@ -871,16 +871,13 @@ DROP DATANODE { MASTER | SLAVE } node_name [, ...]
 
 **命令举例：**
 ```sql
---在集群初始化之前删除datanode slave db1s：
+-- 在集群初始化之前删除datanode slave db1s：
 DROP DATANODE SLAVE db1s;
-
---在集群初始化之前删除coordinator coord1：
+-- 在集群初始化之前删除coordinator coord1：
 DROP COORDINATOR master coord1;
-
---在集群初始化之前删除gtm slave gtm：
+-- 在集群初始化之前删除gtm slave gtm：
 DROP GTM SLAVE gtms;
-
---在集群初始化之前删除gtm master gtm：
+-- 在集群初始化之前删除gtm master gtm：
 DROP GTM MASTER gtm;
 ```
 
@@ -938,7 +935,8 @@ list node host localhost1;
 
 param表用于管理存放AntDB集群中所有节点的postgresql.conf文件中的参数，当参数某个被修改后，该参数就会被添加到此表中，用来标识。对于修改配置参数的查询，可以通过list param命令。
 
-#### 4.5.1set param
+#### 4.5.1 set param
+
 ---
 命令功能：
 更改postgresql.conf节点配置文件中的参数，如果该参数有效，则系统内部会执行相关的操作，使更改生效，此操作只适用于那些不需要重启集群的参数类型（如sighup, user, superuser），而对于修改其它类型的参数，则会给出相应的提示。
@@ -956,11 +954,11 @@ SET GTM { MASTER | SLAVE } node_name ( { parameter = value } [, ...] ) [ FORCE ]
 
 **命令举例：**
 ```sql
---修改coord1上的死锁时间
+-- 修改coord1上的死锁时间
 SET  COORDINATOR  MASTER coord1(deadlock_timeout = '1000ms');
---修改所有的datanode上配置文件中的checkpoint_timeout的参数
+-- 修改所有的datanode上配置文件中的checkpoint_timeout的参数
 SET  DATANODE  all(checkpoint_timeout = '1000s');
---修改所有的datanode上配置文件中的一个不存在的参数
+-- 修改所有的datanode上配置文件中的一个不存在的参数
 SET  DATANODE  all(checkpoint = '10s')  FORCE;
 ```
 
@@ -981,9 +979,9 @@ RESET GTM { MASTER | SLAVE } node_name ( parameter [, ...] ) [ FORCE ]
 
 **命令举例：**
 ```sql
---把datanode master db1的配置参数checkpoint_timeout变为默认值。其中查询结果中的*号是适配符，表示所有满足条件的节点名。
+-- 把datanode master db1的配置参数checkpoint_timeout变为默认值。其中查询结果中的*号是适配符，表示所有满足条件的节点名。
 RESET  DATANODE  MASTER  db1 (checkpoint_timeout);
---把datanode中所有的配置参数checkpoint_timeout变为默认值
+-- 把datanode中所有的配置参数checkpoint_timeout变为默认值
 RESET  DATANODE  all (checkpoint_timeout);
 ```
 #### 4.5.3 list param
@@ -1035,9 +1033,9 @@ LIST  param  COORDINATOR  all;
 
 **命令举例：**
 ```sql
---模糊查询节点db1的配置文件中有wal的参数
+-- 模糊查询节点db1的配置文件中有wal的参数
   SHOW  db1  wal;
---查询节点db1的配置文件中checkponit_timeout的参数的内容
+-- 查询节点db1的配置文件中checkponit_timeout的参数的内容
   SHOW  db1  checkpoint_timeout;
 ```
 ### 4.6 hba表相关命令
@@ -1060,7 +1058,7 @@ where hba_value must be the following:
 
 **命令举例：**
 ```sql
---在hba中添加 10.0.0.0 IP端的所有用户通过md5认证访问所有数据库的配置：
+-- 在hba中添加 10.0.0.0 IP端的所有用户通过md5认证访问所有数据库的配置：
 add hba all ("host all all 10.0.0.0 8 md5");
 ```
 #### 4.6.2 list hba
@@ -1093,7 +1091,7 @@ add hba all ("host all all 10.0.0.0 8 md5");
 
 **命令举例：**
 ```sql
---在hba中删除 10.0.0.0 IP端的所有用户通过md5认证访问所有数据库的配置：
+-- 在hba中删除 10.0.0.0 IP端的所有用户通过md5认证访问所有数据库的配置：
 drop hba all ("host all all 10.0.0.0 8 trust");
 ```
 ### 4.7 集群管理相关命令
@@ -1229,9 +1227,9 @@ Append命令用于向AntDB集群中追加集群节点，用于集群扩容。Gtm
 - 4.执行deploy 命令把集群可执行文件分发到新机器上。
 - 5.在新机器上修改当前用户下隐含文件bashrc，追加如下内容并执行source .bashrc使其生效：
 ```shell
-export PGHOME=/opt/antdb/app (以实际情况修改)
-export PATH=$PGHOME/bin:$PATH
-export LD_LIBRARY_PATH=$PGHOME/lib:$LD_LIBRARY_PATH
+export ADBHOME=/opt/antdb/app (以实际情况修改)
+export PATH=$ADBHOME/bin:$PATH
+export LD_LIBRARY_PATH=$ADBHOME/lib:$LD_LIBRARY_PATH
 ```
 - 6.执行start agent，启动新机器上的agent 进程。
 - 7.执行append命令。
@@ -1351,7 +1349,7 @@ DEPLOY host1,host2;
 
 **命令举例:**
 ```sql
---更新adbmgr端node表及param表中datanode slave datanode1状态为master：
+-- 更新adbmgr端node表及param表中datanode slave datanode1状态为master：
 ADBMGR PROMOTE DATANODE SLAVE datanode1;
 ```
 #### 4.7.10 promote
@@ -1367,15 +1365,15 @@ PROMOTE GTM { MASTER | SLAVE } { node_name }
 
 **命令举例：**
 ```sql
---将datanode slave datanode1提升为读写状态:
+-- 将datanode slave datanode1提升为读写状态:
 PROMOTE DATANODE SLAVE datanode1;
---将gtm slave gtm1提升为读写状态:
+-- 将gtm slave gtm1提升为读写状态:
 PROMOTE GTM SLAVE gtm1;
 ```
 #### 4.7.11 rewind
 ---
 命令功能:
-对GTM或者DATANODE备机执行rewind操作，使其重建备机与主机的对应关系。对GTM备机现在不支持REWIND操作。
+对GTM或者DATANODE备机执行rewind操作，使其重建备机与主机的对应关系。
 
 **命令格式：**
 ```
@@ -1385,9 +1383,9 @@ REWIND GTM SLAVE { node_name }
 
 **命令举例：**
 ```sql
---重建备机datanode slave datanode1与master的关系:
+-- 重建备机datanode slave datanode1与master的关系:
 REWIND DATANODE SLAVE datanode1;
---重建备机gtm slave gtm1与master的关系:
+-- 重建备机gtm slave gtm1与master的关系:
 REWIND GTM SLAVE gtm1;
 ```
 
