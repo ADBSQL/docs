@@ -41,7 +41,9 @@ name| user| port| protocol| agentport|address|adbhome
 ---|---|---|---|---|---|---
  localhost1 | gd   |   22 | ssh      |     10906 | 10.21.20.175 | /data/antdb/app 
  localhost2 | gd   |   22 | ssh      |     10906 | 10.21.20.176 | /data/antdb/app 
-Host表共有7 列，每列的详细解释如下：
+
+
+Host表每列的详细解释如下：
 
 列名|	描述
 ---|---
@@ -145,7 +147,7 @@ postgres=# list param;
   '*'        | coordinator master\|slave | max_connections           | 800
   '*'        | coordinator master\|slave | max_prepared_transactions | 800
   '*'      | datanode master\|slave |max_connections|1000
-*        | gtm master\|slave |max_connections         | 2000             
+  ‘*’| gtm master\|slave |max_connections         | 2000             
 
 Param表每列的解释如下：
 
@@ -414,8 +416,8 @@ add节点 | command
 ---|---
 添加coordinator信息|add coordinator master 名字(path = 'xxx', host='localhost1', port=xxx);
 添加datanode master信息|add datanode master 名字(path = 'xxx', host='localhost1', port=xxx);
-添加datanode slave信息，从节点与master不同名，所以指定的master必须存在，同异步关系通过sync参数设置|add datanode slave名字 for master_name (host='localhost2', port=xxx, path='xxx', sync=t);
-添加gtm信息，从节点必须与主节点不同名，所以指定的master必须存在，同异步关系通过sync参数设置|add gtm master名字(host='localhost3',port=xxx, path='xxx');add gtm slave名字 for maste_name(host='localhost2',port=xxx, path='xxx')
+添加datanode slave信息，从节点与master不同名，所以指定的master必须存在，同异步关系通过SYNC_STATE参数设置|add datanode slave名字 for master_name (host='localhost2', port=xxx, path='xxx', SYNC_STATE='sync');
+添加gtm信息，从节点必须与主节点不同名，所以指定的master必须存在，同异步关系通过SYNC_STATE参数设置|add gtm master名字(host='localhost3',port=xxx, path='xxx');add gtm slave名字 for maste_name(host='localhost2',port=xxx, path='xxx')
 
 添加完成后，使用命令list node查看刚刚添加的节点信息
 
