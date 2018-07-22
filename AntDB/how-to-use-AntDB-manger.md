@@ -4,7 +4,7 @@
 
 关键字 | 解释
 ---|---
-Adbmgr | 管理ADB集群的一个管理工具，可以快速部署和方法管理AntDB 集群。 
+Adbmgr | 管理AntDB集群的一个管理工具，可以快速部署和方法管理AntDB 集群。 
 AntDB 集群 | 即AntDB 分布式数据库，它是有多个单节点组成。 
 节点/AntDB节点 | 即AntDB分布式数据库中的单个节点。节点分三种类型：Coordinator节点，Agtm节点和Datanode节点。 
 agent | AntDB manager通过agent进程管理AntDB集群。 
