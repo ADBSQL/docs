@@ -751,7 +751,10 @@ LIST  host  (user, agentport, address)  localhost1;
 --集群初始化后，机器IP发生变更，已完成host表中内容修改，需要刷新各个数据库节点IP地址信息：
 FLUSH HOST;
 ```
+> flush host操作会重启slave类型的节点，因为需要修改recovery.conf 中的primary_conninfo信息。
+
 ### 4.4 node表相关命令
+
 Node表用于保存部署AntDB 集群中每个节点的信息，同时包括从节点与主节点之间的同/异步关系等。管理node表的操作命令有:
 
 - add node（包含ADD GTM、ADD COORDINATOR、ADD DATANODE）
@@ -1392,7 +1395,183 @@ REWIND DATANODE SLAVE datanode1;
 REWIND GTM SLAVE gtm1;
 ```
 
+### 4.8 Adbmgr 内置job介绍
 
+Adbmgr 可以创建一些定时任务，其中内置了两种类型的任务：
+
+- 数据采集任务
+- 节点监控任务
+
+下面分别对两类任务进行介绍。
+
+通过 `\h add job` 可以获取添加内置job的帮助信息：
+
+```
+postgres=# \h add job
+Command:     ADD JOB
+Description: add one row job information in the job table. The column of "interval" requires an integer value, unit is "second"; The input string of "command" column should be in single quote. If using user-defined monitor item, the input of sql string format likes 'insert into tb_name select adbmonitor_job(''host_name'', ''item_name'')', the item_name in job item table.
+
+ the common used functions for monitor are:
+ for tps qps 'select monitor_databasetps_insert_data()'
+ for database summary 'select monitor_databaseitem_insert_data()'
+ for host 'select monitor_get_hostinfo()'
+ for slow log 'select monitor_slowlog_insert_data()'
+ for gtm handle 'select monitor_handle_gtm(
+        name 'nodename' default '''',
+        bool bforce default true,
+        int reconnect_attempts default 3,
+        int reconnect_interval default 2,
+        int select_timeout default 15)'
+ for coordinator handle 'select monitor_handle_coordinator()'
+ for datanode handle 'select monitor_handle_datanode(
+        name 'nodename' default '''',
+        bool bforce default true,
+        int reconnect_attempts default 3,
+        int reconnect_interval default 2,
+        int select_timeout default 15)
+
+ the limit of monitor_handle_gtm and monitor_handle_datanode functions:
+ 2<=reconnect_attempts<=60, 2<=reconnect_interval<120, 2<=select_timeout<120
+ reconnect_interval and select_timeout unit: "second".
+Syntax:
+ADD JOB [IF NOT EXISTS] job_name ( option )
+
+where option must be the following:
+
+    NEXTTIME = next_time,
+    INTERVAL = interval,
+    STATUS = status,
+    COMMAND = sql_string,
+    DESC = description
+```
+
+
+
+#### 4.8.1 数据采集任务
+
+数据采集任务启动后，会通过主机上的agent采集相应的信息，存放到adbmgr的相关表中，表的说明参考 `相关表` 章节。
+
+#####  配置主机资源采集任务
+
+```
+add job usage_for_host (interval= 60,command = 'select monitor_get_hostinfo();');
+```
+任务说明：间隔60秒，采集主机信息：包括cpu、memory、disk、network等维度。
+
+##### 配置数据库资源采集任务
+
+```
+add job usage_for_adb (interval= 60,command = 'select monitor_databaseitem_insert_data();');
+```
+任务说明：间隔60秒，采集数据库信息：包括库大小、归档信息、提交回滚率、流复制延迟、长事务等信息。
+
+##### 配置数据库性能指标采集任务
+
+```
+add job tps_for_adb (interval= 60,command = 'select monitor_databasetps_insert_data();');
+```
+
+任务说明：间隔60秒，采集数据库TPS、QPS信息。
+
+#####  配置数据库慢SQL监控任务
+
+```
+add job slowlog_for_adb (interval= 60,command = 'select monitor_slowlog_insert_data();');
+```
+任务说明：间隔60秒，采集慢SQL信息，需要用到pg_stat_statement插件。
+
+#### 4.8.2 节点监控任务
+
+##### 	配置coordinator监控任务
+
+```
+add job  mon_coord (interval = 5, status = true,command ='select monitor_handle_coordinator()' );
+```
+
+任务说明：间隔5秒，检查coordinator中是否有失效节点，如果有，进行重试连接，重试三次失败后，从集群中剔除失效coordinator节点。
+
+##### 配置gtm 监控任务
+
+```
+add job mon_gtm (interval = 5,status=true,command='select monitor_handle_gtm()');
+```
+
+任务说明：间隔5秒，检查gtm是否失效，如果失效，进行重试连接，重试三次失败后，进行failover gtm操作。
+
+##### 配置datanode 监控任务
+
+```
+add job mon_datanode (interval = 5,status=true,command='select monitor_handle_datanode()');
+```
+
+任务说明：间隔5秒，检查datanode master是否有失效节点，如果有，进行重试连接，重试三次失败后，进行failover datanode操作。每次job运行，处理一个失效的datanode master。
+
+以上均使用默认参数，如果想修改默认参数值，则用如下方式添加
+
+```
+add job mon_datanode (interval = 5,status=true,command='select monitor_handle_datanode('''',true,5,3,20)');
+```
+
+**注意**：
+
+添加节点监控任务后，会阻止`stop all`、`start all` 操作。
+
+当监控任务状态为true的时候，这两个操作是失败，并给出提示：
+
+```
+postgres=# stop all mode fast;
+ERROR:  on job table, the content of job "mon_coord" includes "monitor_handle_coordinator" string and its status is "on"; you need do "ALTER JOB "mon_coord" (STATUS=false);" to alter its status to "off" or set "adbmonitor=off" in postgresql.conf of ADBMGR to turn all job off which can be made effect by mgr_ctl reload
+HINT:  try "list job" for more information
+postgres=# start all;
+ERROR:  on job table, the content of job "mon_coord" includes "monitor_handle_coordinator" string and its status is "on"; you need do "ALTER JOB "mon_coord" (STATUS=false);" to alter its status to "off" or set "adbmonitor=off" in postgresql.conf of ADBMGR to turn all job off which can be made effect by mgr_ctl reload
+HINT:  try "list job" for more information
+postgres=# 
+```
+
+解决办法：将节点监控的任务暂时设置为false，参考下面介绍的**暂停任务**。
+
+#### 4.8.3  管理任务
+
+##### 查看添加的任务
+
+```
+list job;
+```
+
+#####  暂停任务
+
+```
+alter job usage_for_host (status = false);
+```
+##### 启动任务
+
+```
+alter job usage_for_host (status = true);
+```
+
+#####  删除任务
+
+```
+drop job usage_for_host;
+```
+#### 4.8.4  相关表
+
+|模块|Schema|表名|
+|-|-|-|
+|主机资源|pg_catalog|monitor_host|
+|||monitor_cpu|
+|||monitor_mem|
+|||monitor_disk|
+|||monitor_net|
+|数据库资源采集|pg_catalog|monitor_databaseitem|
+|||monitor_databasetps|
+|慢sql采集|pg_catalog|monitor_slowlog|
+|告警信息|pg_catalog|monitor_alarm|
+|||monitor_host_threshold|
+|||monitor_resolve|
+|任务管理|pg_catalog|monitor_job|
+|||monitor_jobitem|
+|用户管理|pg_catalog|monitor_user|
 
 ## 第五章 问题及解决方法
 
