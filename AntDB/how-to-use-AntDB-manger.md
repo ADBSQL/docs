@@ -220,7 +220,7 @@ rpm -ivh adb-3.2.703602c-10.el7.centos.x86_64.rpm
 
 注：在执行rpm安装之前，需要找AntDB交付人员咨询rpm包的安装路径。
 
-### 2.3初始化Adbmgr
+### 2.3 初始化Adbmgr
 
 ---
 编译Adbmgr 之后，会在指定的目录的bin目录下产生initmgr，和mgr_ctl可执行文件。要想初始化Adbmgr 还需要配置PATH变量才行。
@@ -269,7 +269,7 @@ drwx------ 3 gd gd  4096 Oct 17 17:28 pg_xlog
 -rw------- 1 gd gd    88 Oct 17 17:28 postgresql.auto.conf
 -rw------- 1 gd gd 22234 Oct 17 17:28 postgresql.conf
 ```
-### 2.4启动 Adbmgr
+### 2.4 启动 Adbmgr
 
 ---
 Adbmgr初始化成功后，就可以启动它了。有如下两种启动方式，可以任选一种执行。
@@ -312,7 +312,7 @@ LOG:  adb monitor launcher started
  67462 ?        Ss     0:00  \_ adbmgr: stats collector process  
  67463 ?        Ss     0:00  \_ adbmgr: adb monitor launcher process 
 ```
-###  2.5停止Adbmgr
+###  2.5 停止Adbmgr
 
 ---
 命令格式：
@@ -1373,6 +1373,7 @@ PROMOTE DATANODE SLAVE datanode1;
 PROMOTE GTM SLAVE gtm1;
 ```
 #### 4.7.11 rewind
+
 ---
 命令功能:
 对GTM或者DATANODE备机执行rewind操作，使其重建备机与主机的对应关系。
@@ -1396,6 +1397,7 @@ REWIND GTM SLAVE gtm1;
 ## 第五章 问题及解决方法
 
 ### 5.1 init all时报ERROR
+
 ---
 - 问题：在init all 时会报如下错误：
 ERROR:  character with byte sequence 0xe6 0x8b 0x92 in encoding "UTF8" has no equivalent in encoding "LATIN1"
