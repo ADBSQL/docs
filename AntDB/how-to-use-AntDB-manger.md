@@ -1264,6 +1264,7 @@ APPEND COORDINATOR coord5 FOR coord1;
 APPEND ACTIVATE COORDINATOR coord5;
 ```
 #### 4.7.6 failover
+
 ---
 命令功能：
 当集群中的gtm/datanode master主节点出现问题的时候，可以通过此命令把备节点主机切换过来，保证集群的稳定性。
@@ -1298,7 +1299,39 @@ FAILOVER DATANODE db1;
 -- 将运行正常的异步备机强制升为主机：
 FAILOVER DATANODE  db1 FORCE;
 ```
-#### 4.7.7 clean
+####  4.7.7 switchover
+
+命令功能：主备机之间做切换，原来的备机升为主，原来的主机降为备机，从跟随到新的主机上。切换的时候会检测主备之间的xlog位置是否一致，如果一致，则进行切换，不一致，则不进行切换。如果需要进行强制切换，则需要添加force 关键字。
+
+> **如果通过加”FORCE”命令强制进行主备切换，可能存在数据丢失风险。**
+
+**命令格式**
+
+```
+Command:     SWITCHOVER DATANODE
+Description: datanode master, datanode slave switchover, the original master changes to slave and the original slave changes to master
+Syntax:
+SWITCHOVER DATANODE SLAVE datanode_name
+
+Command:     SWITCHOVER GTM
+Description: gtm master, gtm slave switchover, the original master changes to slave and the original slave changes to master
+Syntax:
+SWITCHOVER GTM SLAVE gtm_name
+```
+
+**命令举例：**
+
+```sql
+-- datanode master db1_1 与slave db1_2 交换角色
+switchover datanode slave db1_2;
+-- datanode master db1_2 与slave db1_1 
+switchover datanode slave db1_1 force;
+```
+
+
+
+#### 4.7.8 clean
+
 ---
 命令功能：
 Clean 命令用于清空AntDB 集群中节点数据目录下面的所有数据。执行此命令的前提是所有节点都处在stop 状态。执行clean命令不会有交互，所以如果需要保留数据，请慎重执行这个命令。先只支持clean all命令。
@@ -1323,7 +1356,8 @@ CLEAN COORDINATOR MASTER coord1;
 CLEAN MONITOR 15;
 ```
 
-#### 4.7.8 deploy
+#### 4.7.9 deploy
+
 ---
 命令功能：
 Deploy 命令用于把Adbmgr所在机器编译的AntDB 集群的可执行文件向指定主机的指定目录上分发。常用于在刚开始部署AntDB集群或者AntDB 集群源码有改动，需要重新编译时。
@@ -1344,7 +1378,8 @@ DEPLOY host1,host2 PASSWORD 'ls86SDf79';
 DEPLOY host1,host2;
 ```
 
-#### 4.7.9 adbmgr promote
+#### 4.7.10 adbmgr promote
+
 ---
 命令功能：
 在NODE表中更改指定名称的节点对应的状态为master,删除该节点对应的master信息；同时在PARAM表中更新该节点对应的参数信息。该命令主要用在执行FAILOVER出错后续分步处理中。具体功能可通过帮助命令“\h adbmgr promote” 查看。
@@ -1357,7 +1392,8 @@ DEPLOY host1,host2;
 -- 更新adbmgr端node表及param表中datanode slave datanode1状态为master：
 ADBMGR PROMOTE DATANODE SLAVE datanode1;
 ```
-#### 4.7.10 promote
+#### 4.7.11 promote
+
 ---
 命令功能:
 对节点执行PROMOTE操作，将备机的只读状态更改为读写状态，通过SELECT PG_IS_IN_RECOVERY()查看为f结果。该命令主要用在执行FAILOVER出错后续分步处理中。具体功能可通过帮助命令“\h promote gtm” 或者 “\h promote datanode”查看。
@@ -1375,7 +1411,7 @@ PROMOTE DATANODE SLAVE datanode1;
 -- 将gtm slave gtm1提升为读写状态:
 PROMOTE GTM SLAVE gtm1;
 ```
-#### 4.7.11 rewind
+#### 4.7.12 rewind
 
 ---
 命令功能:
