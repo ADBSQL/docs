@@ -759,10 +759,11 @@ Node表用于保存部署AntDB 集群中每个节点的信息，同时包括从�
 
 - add node（包含ADD GTM、ADD COORDINATOR、ADD DATANODE）
 - alter node（包含ALTER GTM、ALTER COORDINATOR、ALTER DATANODE）
+- remove node 包含DROP GTM、DROP COORDINATOR、DROP DATANODE）
 - drop node（包含DROP GTM、DROP COORDINATOR、DROP DATANODE）
 - list node
 
-下面对这四个命令进行介绍
+下面对这五个命令进行介绍
 
 #### 4.4.1 add node
 ---
@@ -859,7 +860,41 @@ ALTER DATANODE SLAVE db1s (SYNC_STATE='sync');
 ALTER DATANODE SLAVE db1s (SYNC_STATE='async');
 ```
 
-#### 4.4.3 drop node
+####  4.4.3 remove node
+
+---
+
+命令功能：
+
+在node表中修改节点的initialized和字段值为false，并从pgxc_node表中删除node，但在mgr的node表中保留信息。
+
+**注意**：
+
+目前只能remove coordiantor和datanode slave、gtm slave，且要求节点处于`not running` 状态。
+
+**命令格式**：
+
+```sql
+REMOVE COORDINATOR MASTER node_name
+REMOVE DATANODE SLAVE node_name
+REMOVE GTM SLAVE node_name
+```
+
+**命令举例**
+
+```sql
+-- 从集群中删除coordinator节点
+remove coordinator master cd2;
+-- 从集群中删除datanode slave节点
+remove datanode slave db1_2;
+-- 从集群中删除gtm slave节点
+remove datanode slave gtm2;
+```
+
+
+
+#### 4.4.4 drop node
+
 ---
 命令功能：
 在node表中删除节点信息。具体功能可通过帮助命令“\h drop gtm” 、”\h drop coordinator”、”\h drop datanode”查看。
@@ -868,6 +903,7 @@ ALTER DATANODE SLAVE db1s (SYNC_STATE='async');
 在集群初始化前，可以通过drop node删除节点信息，但是在存在备机的情况下，不允许删除对应的主机节点信息；在集群初始化后，不允许drop node操作。
 
 **命令格式：**
+
 ```sql
 DROP GTM { MASTER | SLAVE } node_name
 DROP COORDINATOR MASTER node_name [, ...]
@@ -886,7 +922,8 @@ DROP GTM SLAVE gtms;
 DROP GTM MASTER gtm;
 ```
 
-#### 4.4.4 list node
+#### 4.4.5 list node
+
 ---
 命令功能：
 显示node表中节点信息。具体功能可通过帮助命令“\h list node” 查看。
@@ -1031,7 +1068,7 @@ LIST  param  COORDINATOR  all;
 ---
 
 命令功能：
-	显示配置文件中的参数信息，支持模糊查询。
+​	显示配置文件中的参数信息，支持模糊查询。
 
 **命令格式：**
 > SHOW node_name parameter
@@ -1050,7 +1087,7 @@ hba表用于管理存放AntDB集群中所有coordiantor节点的pg_hba.conf文�
 #### 4.6.1 add hba
 
 命令功能：
-	添加新的hba配置到coordinator中。通过 \h add hba 获取帮助信息。
+​	添加新的hba配置到coordinator中。通过 \h add hba 获取帮助信息。
 
 **命令格式：**
 ```sql
@@ -1069,7 +1106,7 @@ add hba all ("host all all 10.0.0.0 8 md5");
 #### 4.6.2 list hba
 ---
 命令功能：
-	显示通过add hba添加的配置项。
+​	显示通过add hba添加的配置项。
 
 **命令格式：**
 >LIST HBA [ coord_name [, ...] ]
@@ -1089,7 +1126,7 @@ add hba all ("host all all 10.0.0.0 8 md5");
 #### 4.6.3 drop hba
 ---
 命令功能：
-	删除通过add hba添加的配置项。
+​	删除通过add hba添加的配置项。
 
 **命令格式：**
 >DROP HBA { ALL | coord_name } [ ( "hba_value" [, ...] ) ]
