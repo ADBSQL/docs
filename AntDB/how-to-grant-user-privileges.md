@@ -1,5 +1,5 @@
-#AntDB用户授权
-##AntDB权限说明
+# AntDB用户授权
+## AntDB权限说明
 AntDB权限分为两部分，一部分是数据库系统权限，可以授予role或user(两者区别在于后者默认具有login权限)；一部分为数据库对象的操作权限。
 对超级用户不做权限检查，其它走acl。
 
@@ -81,8 +81,8 @@ USAGE：对于程序语言来说，允许使用指定的程序语言创建函数
 
 ALL PRIVILEGES：表示一次性给予可以授予的权限。
 
-##用例
-###新建只读角色
+## 用例
+### 新建只读角色
 
 CREATE ROLE role1_select WITH
 
@@ -98,7 +98,7 @@ CREATE ROLE role1_select WITH
 COMMENT ON ROLE role1_select IS 'for read';
 
 grant SELECT on table t1 to role1_select;
-###新建写角色
+### 新建写角色
 CREATE ROLE role1_insert WITH
 
 	LOGIN
@@ -113,7 +113,7 @@ CREATE ROLE role1_insert WITH
 COMMENT ON ROLE role1_insert IS 'for write';
 
 grant INSERT,UPDATE,DELETE,TRUNCATE on table t1 to role1_insert;
-###新建用户并赋予指定角色
+### 新建用户并赋予指定角色
 创建一个默认用户，只有login权限，其他权限都收回。
 
 CREATE USER user1 WITH
@@ -126,17 +126,17 @@ CREATE USER user1 WITH
 	NOREPLICATION
 	CONNECTION LIMIT -1
 	PASSWORD 'xxxxxx';
-####赋予只读角色
+#### 赋予只读角色
 grant role1_select TO user1 ;
-####赋予写角色
+#### 赋予写角色
 grant role1_insert TO user1 ;
-###可以通过函数来验证模式下的表的相应权限
+### 可以通过函数来验证模式下的表的相应权限
 select has_table_privilege('aa','select');
 
 select has_table_privilege('aa','insert');
 
 
-##对sequence类型的授权
+## 对sequence类型的授权
 usage有currval,nextval这两个函数可用
 
 grant usage on sequence sq1 to user1;
@@ -146,7 +146,7 @@ update有setval这个函数可用
 grant update on sequence sq1 to user1;
 
 
-##角色权限的继承
+## 角色权限的继承
 
 CREATE ROLE role_father xxx;
 
@@ -154,7 +154,7 @@ CREATE ROLE role_son xxx;
 
 grant role_father to role_son;
 
-##查看权限
+## 查看权限
 在psql中的查看权限的快捷指令
 
 \dn[S+]		列出所有模式
