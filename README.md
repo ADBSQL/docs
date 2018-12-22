@@ -1,6 +1,8 @@
 # docs
 ADBSQL documents.
 
+[TPCH AntDB4.0最新版 vs AntDB3.1](AntDB/TPCH-TEST-AntDB4.0-vs-AntDB3.1.md)
+
 [快速安装](AntDB/how-to-install-AntDB.md)
 
 [Adbmgr 使用手册](AntDB/how-to-use-AntDB-manger.md)
