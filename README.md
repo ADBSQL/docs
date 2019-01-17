@@ -1,6 +1,8 @@
 # docs
 ADBSQL documents.
 
+[AntDB4.0 分区表使用说明](AntDB/how-to-create-table-paratition-on-AntDB.md)
+
 [AntDB 如何合理选择分片键](AntDB/how-to-choose-shardingKey-on-AntDB.md)
 
 [Oracle语法兼容对比 Oracle vs AntDB vs Postgresql](AntDB/oracle-gramm-compatible-Oracle-vs-AntDB-vs-Postgresq.md)
