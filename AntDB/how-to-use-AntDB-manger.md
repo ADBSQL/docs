@@ -51,7 +51,7 @@ name|	主机名，即address列的IP address对应的主机名。
 user| 用户名，部署AntDB集群的用户名。 
 port|	Protocol列使用的协议的端口，ssh协议默认使用22端口。
 protocol| Adbmgr 与agent通信使用的协议。默认使用ssh协议。 
-agentport|	Agent进程使用的端口。这个需要由用户指定一个与其他进行不冲突的端口号。
+agentport|	Agent进程使用的端口。这个需要由用户指定一个与其他进程不冲突的端口号。
 address	|IP address，主机的ip 地址。
 pghome	|部署AntDB 集群的可执行文件(二进制文件)在主机上的存放路径。
 
