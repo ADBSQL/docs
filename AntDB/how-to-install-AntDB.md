@@ -25,7 +25,7 @@ yum install -y libssh2-devel
 ```
 
 通过github 获取源码：
-- git clone https://github.com/ADBSQL/AntDB  -b ADB3_1_STABLE
+- git clone https://github.com/ADBSQL/AntDB  -b ADB3_2_STABLE
 
 接着就可以进行编译安装步骤：
 
