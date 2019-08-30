@@ -56,7 +56,7 @@ rpm -ivh adb-2.2.703602c-10.el7.centos.x86_64.rpm
 编译ADB manager之后，会在指定的目录的bin目录下产生initmgr和mgr_ctl可执行文件。
 
 为了使用方便，初始化ADB manager还需要配置PATH变量。
-执行**vim ~/.basrhrc**打开文件，追加如下内容：
+执行**vim ~/.bashrc**打开文件，追加如下内容：
 ```shell
 export ADBHOME=/opt/adbsql 
 export PATH=$ADBHOME/bin:$PATH
@@ -66,7 +66,7 @@ export LD_LIBRARY_PATH=$ADBHOME/lib:$LD_LIBRARY_PATH
 
 执行下面命令开始初始化ADB manager：
 ```shell
-initmgr –D /data/adb/mgr
+initmgr -D /data/adb/mgr
 ```
 
 
