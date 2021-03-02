@@ -44,11 +44,11 @@
 
 ## 结果分析
 **TPCH query22 各指标对比**
-![TPCH query22 各指标对比](https://github.com/greatebee/AntDB/blob/master/pic/tpch_1.png)
+![TPCH query22 各指标对比](image/tpch_1.png)
 **总耗时对比**
-![总耗时对比](https://github.com/greatebee/AntDB/blob/master/pic/tpch_2.png)
+![总耗时对比](image/tpch_2.png)
 **性能提升对比**
-![性能提升对比](https://github.com/greatebee/AntDB/blob/master/pic/tpch_3.png)
+![性能提升对比](image/tpch_3.png)
 
 ## 总结
 1. AntDB最新版本4.0 得益于在数据reduce、执行计划微调等方面的改善，query 5、14、21 3种场景性能提升较为显著。

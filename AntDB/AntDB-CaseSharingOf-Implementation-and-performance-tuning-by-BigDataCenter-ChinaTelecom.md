@@ -20,7 +20,7 @@ GTM/Datanode/Adbmgr通过流复制协议，全部实现一主一从的高可用�
 |AntDB架构|4C8D 1主1从|
 
 **AntDB部署架构图**
-![AntDB部署架构图](https://github.com/greatebee/AntDB/blob/master/pic/scdx_tuning_1.jpg)
+![AntDB部署架构图](image/scdx_tuning_1.jpg.png)
 
 # 场景优化
 AntDB在该省电信落地过程中得到快速认可，基本上解决了客户95%的分析场景，性能也超过了客户的预期，但一些比较复杂业务场景没有达到客户的期望，AntDB团队成员积极分析场景的SQL，对AntDB的内核以及SQL的写法进行了持续的优化，研发并支持一序列针对性能优化的新功能。 
@@ -33,9 +33,9 @@ AntDB在该省电信落地过程中得到快速认可，基本上解决了客户
 
 最终性能优化明显，最高的性能提升了190倍。
 
-![优化前后对比图](https://github.com/greatebee/AntDB/blob/master/pic/scdx_tuning_2.png)
+![优化前后对比图](image/scdx_tuning_2.png)
 
-![优化前后对比表](https://github.com/greatebee/AntDB/blob/master/pic/scdx_tuning_3.png)
+![优化前后对比表](image/scdx_tuning_3.png)
 
 本文将详细介绍案例 1/3/5/7 的优化过程。
 
@@ -59,14 +59,14 @@ AntDB在该省电信落地过程中得到快速认可，基本上解决了客户
 |优化后|0.8|
 |性能提升|10 倍|
 
-![优化前后对比图](https://github.com/greatebee/AntDB/blob/master/pic/scdx_tuning_4.png)
+![优化前后对比图](image/scdx_tuning_4.png)
 
 # 场景3案例分享
 ## 场景说明
 该场景是报表统计类SQL，用于统计某业务在一段时间内每天的新增用户数，并按省/地市分组统计后汇总输出。
 
 效果如下：
-![优化前后对比图](https://github.com/greatebee/AntDB/blob/master/pic/scdx_tuning_5.png)
+![优化前后对比图](image/scdx_tuning_5.png)
 ## 案例分析
 该SQL选择Parallel Nested Loop Left Join并行嵌套循环的连接方式，而基表的数据量是1.2 亿，loop的开销非常高。AntDB研发团队在制定该SQL的优化措施时，决定将并行hashjoin纳入AntDB3.1版本中，以替代nestedloop，提升该场景下的性能。 
 ## 优化措施
@@ -82,14 +82,14 @@ AntDB在该省电信落地过程中得到快速认可，基本上解决了客户
 |优化后|6|
 |性能提升|30 倍|
 
-![优化前后对比图](https://github.com/greatebee/AntDB/blob/master/pic/scdx_tuning_6.png)
+![优化前后对比图](image/scdx_tuning_6.png)
 
 # 场景5案例分享
 ## 场景说明
 该场景是报表统计类SQL，用于统计多种业务在某一天的新装用户数，按省/地市分组统计，部分业务允许指定条件过滤后汇总输出。
 
 效果如下：
-![优化前后对比图](https://github.com/greatebee/AntDB/blob/master/pic/scdx_tuning_7.png)
+![优化前后对比图](image/scdx_tuning_7.png)
 ## 案例分析
 该SQL使用了cte+union all语法，在AntDB3.1版本之前，对该语法的支持还不够全面，因此，在该场景下选择了效率较差的pgxc的执行计划。
 AntDB研发团队在制定该SQL的优化措施时，决定将cte+union all纳入AntDB3.1版本的集群计划中，以替代pgxc的执行计划，来充分利用集群计划的并行优势。
@@ -107,14 +107,14 @@ AntDB研发团队在制定该SQL的优化措施时，决定将cte+union all纳�
 |优化后|3|
 |性能提升|50 倍|
 
-![优化前后对比图](https://github.com/greatebee/AntDB/blob/master/pic/scdx_tuning_8.png)
+![优化前后对比图](image/scdx_tuning_8.png)
 
 
 # 场景7案例分享
 ## 场景说明
 该场景是报表统计类SQL，用于统计多种业务在某一天的新装用户数，按省/地市分组统计，并指定多种开关类分组条件后汇总输出。
 ## 案例分析
-![优化前后对比图](https://github.com/greatebee/AntDB/blob/master/pic/scdx_tuning_9.png)
+![优化前后对比图](image/scdx_tuning_9.png)
 该SQL在进行group by 分组汇聚时，使用了多个维度，且分组字段均选择text数据类型，导致优化器估算出的分组数太多，从而无法利用parallel能力，而选择了seqscan。
 
 分析该SQL，红框内的字段应该是bool数据类型，然而业务在建模时，选择了text数据类型。如果改成bool类型，对优化器在进行估算分组总数、从而确定最优执行计划选择时，大有裨益：
@@ -139,7 +139,7 @@ AntDB研发团队在制定该SQL的优化措施时，决定将cte+union all纳�
 |优化后|1.5|
 |性能提升|169 倍|
 
-![优化前后对比图](https://github.com/greatebee/AntDB/blob/master/pic/scdx_tuning_10.png)
+![优化前后对比图](image/scdx_tuning_10.png)
 
 # 总结
 在海量数据的分析型场景里，业务SQL结构复杂多变，上述场景也只是冰山一角。在面对更多分析型场景时，AntDB仍需继续努力。

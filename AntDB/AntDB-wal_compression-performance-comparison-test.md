@@ -52,7 +52,7 @@ WAL的优化:
 
 ### 测试结果
 
-![](https://github.com/greatebee/AntDB/blob/master/pic/wal_compression_1.jpg)
+![](image/wal_compression_1.jpg)
 
 ### 结果分析
 
@@ -76,7 +76,7 @@ WAL的优化:
 
 ### 测试结果
 
-![](https://github.com/greatebee/AntDB/blob/master/pic/wal_compression_2.png)
+![](image/wal_compression_2.png)
 
 ### 结果分析
 
@@ -103,7 +103,7 @@ WAL的优化:
 
 ### 测试结果
 
-![](https://github.com/greatebee/AntDB/blob/master/pic/wal_compression_3.png)
+![](image/wal_compression_3.png)
 
 ### 结果分析
 
