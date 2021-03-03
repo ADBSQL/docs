@@ -154,7 +154,8 @@ datanode容器：
 
 ## 结合docker run 详细说明
 
-`docker run -d \
+```
+docker run -d \
 -e PARAMS="gtm1&/home/adb/data/gtm1&gtm" 
 -v /home/ips/data/gtm1:/home/adb/data/gtm1 \
 -p 9435:5432 \
@@ -168,7 +169,7 @@ datanode容器：
 --add-host db1:172.30.88.31 \
 --add-host db2:172.30.98.32 \
 adb24
-`
+```
 
 --name gtm1 ：容器名称，无限制。便于维护，一般和容器的主机名一致。
 

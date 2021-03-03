@@ -12,6 +12,7 @@
 ***
 
 # 环境介绍
+
 |操作系统|centos7.4|
 |:-----|:-------|
 |docker版本|1.13|
@@ -44,15 +45,17 @@
 
 **物理机1：**
 
+```
 mkdir -p /home/ips/data/{cd1,db1,gtm1} 
-
 chmod -R 777 /home/ips/data 
+```
 
 **物理机2：**
 
+```
 mkdir -p /home/ips/data/{cd2,db2} 
-
 chmod -R 777 /home/ips/data
+```
 
 2. 启动容器（物理机1：gtm1、cd1、db1 &&  物理机2：cd2、db2）
 

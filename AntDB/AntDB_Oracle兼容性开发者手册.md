@@ -2167,11 +2167,11 @@ Interval是指两个日期或时间之前的间隔。
 -   **INTERVAL YEAR TO MONTH：**
 
 **格式：**
-
+```
 INTERVAL 'integer [- integer ]' { YEAR \| MONTH } [ TO { YEAR \| MONTH } ]
 
 INTERVAL 'integer [- integer ]' { YEAR \| MONTH } [ (precision) ]
-
+```
 其中precision是指精度，在AntDB中不会实际限制精度，只是语法上支持。在Oracle中，如果指定的precision太小会报错，但是AntDB不会报错，仍然按照实际的精度显示。
 
 **示例：**
@@ -2190,17 +2190,17 @@ postgres=#  select interval '100' year(2) from dual;
 -   **INTERVAL DAY TO SECOND**
 
 **格式**：
-
+```
 INTERVAL '{ integer \| integer time_expr \| time_expr }'
 
-{{ DAY \| HOUR \| MINUTE \| SECOND }
+{{ DAY \| HOUR \| MINUTE \| SECOND }}
 
 [ TO { DAY \| HOUR \| MINUTE \| SECOND [ (fractional_seconds_precision) ] } ]
 
 INTERVAL '{ integer \| integer time_expr \| time_expr }'
 
 { { DAY \| HOUR \| MINUTE \| SECOND} [ (leading_precision) ] }
-
+```
 其中precision是指精度，在AntDB中不会实际限制精度，只是语法上支持。在Oracle中，如果指定的precision太小会报错，但是AntDB不会报错，仍然按照实际的精度显示。且秒的精度只能精确到6位。如果指定秒的精度大于6位，则会转化为6。
 
 **示例：**

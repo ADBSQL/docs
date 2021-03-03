@@ -10,6 +10,7 @@ grant，revoke，alter password
 ## 5. TCL
 commit，rollback，savepoint
 ## 6. 数据类型
+
 |ORACLE	|AntDB	|Postgresql|
 |:------|:------|:---------|
 |varchar2	|varchar2	|varchar|
@@ -21,6 +22,7 @@ commit，rollback，savepoint
 |blob	|blob	|bytea   |
 |rownum	|rownum	|无  |
 |rowid	|rowid	|ctid|
+
 ## 7. 系统函数
 **原生支持： 原生支持： √；不支持：╳；扩展支持 扩展支持 ：○**
 
@@ -120,6 +122,7 @@ commit，rollback，savepoint
 |	        |SUM * 	        |√ 	|√ 	|√ |
 
 ## 8. SQL运算符
+
 |SQL运算符类型	|运算符名称	|ORACLE	|AntDB	|Postgresql|
 |:--------|:----------|:----------|:-------|:-----------|
 |算数运算符	|+	|√ 	|√ 	|√ |
@@ -148,7 +151,9 @@ commit，rollback，savepoint
 |	          |    minus	    |√ 	|√ 	|except |
 |	          |    intersect	|√ 	|╳ 	|√ |
 
+
 ## 9. 查询
+
 |SQL查询类型	|名称	|ORACLE	|AntDB	|Postgresql|
 |:--------|:----------|:----------|:-------|:-----------|
 |去重	|distinct	|√ 	|√ 	|√ |
@@ -162,7 +167,9 @@ commit，rollback，savepoint
 |批量insert	|insert all into	|√ 	|╳ insert into values	|╳ insert into values|
 |merge into	|merge into	      |√ 	|╳ upsert	|╳ upsert|
 
+
 ## 10. 表连接
+
 |表连接类型	|表连接名称	|ORACLE	|AntDB	|Postgresql|
 |:--------|:----------|:----------|:-------|:-----------|
 |内连接	|(inner) join	        |√ 	|√ 	|√ |
@@ -172,7 +179,9 @@ commit，rollback，savepoint
 |全连接	|full (outer) join	  |√ 	|√ 	|√ |
 |(+)	  |(+)	                |√ 	|√ 	|╳ |
 
+
 ## 11. 视图/函数/存储过程/触发器
+
 |类型	|名称	|ORACLE	|AntDB	|Postgresql|
 |:--------|:----------|:----------|:-------|:-----------|
 |视图	    |create view	    |√ 	|√ 	|√ |
@@ -188,7 +197,9 @@ commit，rollback，savepoint
 |	        |alter trigger	  |√ 	|√ 	|√ |
 |	        |drop trigger	    |√ 	|√ 	|√ |
 
+
 ## 12. sequence
+
 |类型	|名称	|ORACLE	|AntDB	|Postgresql|
 |:--------|:----------|:----------|:-------|:-----------|
 |新建序列	|create sequence	|√ 	|√ 	|√ |
@@ -197,7 +208,9 @@ commit，rollback，savepoint
 |操作序列	|seq.nextVal	    |√ 	|√ 	|╳ nextVal('seq')|
 |	        |seq.currVal	    |√ 	|√ 	|╳ currVal('seq')|
 
+
 ## 13. 其他
+
 |类型	|名称	|ORACLE	|AntDB	|Postgresql|
 |:--------|:----------|:----------|:-------|:-----------|
 |过程语言	        |declare	    |√ 	|√ 	|√ |
@@ -213,4 +226,5 @@ commit，rollback，savepoint
 |like通配符	      |%	          |√ 	|√ 	|√ |
 |	                |_	          |√ 	|√ 	|√ |
 |dual虚拟表	      |dual	      |√ 	|√ 	|╳ |
+
 

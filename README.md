@@ -20,6 +20,8 @@
 * [Oracle语法兼容对比 Oracle vs AntDB vs Postgresql](AntDB/oracle-gramm-compatible-Oracle-vs-AntDB-vs-Postgresq.md)
 * [AntDB 如何合理选择分片键](AntDB/how-to-choose-shardingKey-on-AntDB.md)
 * [AntDB wal_compression日志压缩性能对比测试](AntDB/AntDB-wal_compression-performance-comparison-test.md)
+* [Oracle兼容性开发者手册](AntDB/AntDB_Oracle兼容性开发者手册.md)
+
 #### AntDB 容器化
 
 * [AntDB 容器化设计概述](AntDB/AntDB-docker-design.md)
